@@ -22,7 +22,7 @@ size = (448,448) # 맘대로 수정
 input_size= (160,160)# 모델에 삽입되는 사이즈
 
 
-##-------------------------------------------------Load images --------------------------------------------------------------------##
+##-------------------------------------------------Load and crop images --------------------------------------------------------------------##
 
 profile_imgs = load_imgs(profile_images_path,size) # 리스트 반환
 self_imgs =load_imgs(self_image_path,size)
@@ -33,8 +33,7 @@ for img in profile_imgs:
     for detected_face in detected_faces:
         profile_faces.append(detected_face)
 
-
-self_faces=crop(self_imgs[0],input_size)
+self_faces=crop(self_imgs[0],input_size) # 한장만
 
 
 
@@ -51,25 +50,24 @@ profile_predictions=np.reshape(profile_predictions,[-1,1,512])
 self_predictions=np.reshape(self_predictions,[-1,1,512])
 
 
-print(profile_predictions.shape)
-print(self_predictions.shape)
-
 eucledian_dist = []
+print("벡터 거리 정보/ 1.1이하는 동일인")
 for i in range(len(profile_predictions)):
     for j in range(len(self_predictions)):
         dist=np.linalg.norm(profile_predictions[i]-self_predictions[j])
-        print(dist)
         eucledian_dist.append(dist)
+print(eucledian_dist)
+# 느낌 비슷한 연예인 0.8x 
 
 
-
-
-## ----------------------------------- 이미지 체크할 때/ for 문에 profile_imgs 나 self_imgs 를 써서 크로핑 된 이미지를 확인 가능하다 -------------------------------## 
-# for i in self_imgs:
-#     a=crop(i,(160,160))
-#     a=np.array(a)
-#     for j in a:
-#         plt.imshow(j)
-#         plt.show()
+## ----------------------------------- 이미지 체크할 때/ loded_imgs에 profile_imgs 나 self_imgs 를 써서 크로핑 된 이미지를 확인 가능하다 -------------------------------## 
+loded_imgs = profile_imgs# select profile_imgs or self_imgs
+ 
+for i in loded_imgs:
+    a=crop(i,(160,160))
+    a=np.array(a)
+    for j in a:
+        plt.imshow(j)
+        plt.show()
 
 
