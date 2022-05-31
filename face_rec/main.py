@@ -23,14 +23,14 @@ selfie_image_path= './images/selfie'
 model_path= './model/20180402-114759.pb'
 predictor_path ='./model/shape_predictor_68_face_landmarks.dat'
 
-size = (448,448) # 맘대로 수정
+
 input_size= (160,160)# 모델에 삽입되는 사이즈
 
 
 ##-------------------------------------------------Load and crop images --------------------------------------------------------------------##
 
-profile_imgs = load_imgs(profile_images_path,size) # 리스트 반환
-selfie_img =load_imgs(selfie_image_path,size)
+profile_imgs = load_imgs(profile_images_path) # 리스트 반환 / 원본 로드 
+selfie_img =load_imgs(selfie_image_path)
 
 predictor = dlib.shape_predictor(predictor_path)
 detector = dlib.get_frontal_face_detector()
