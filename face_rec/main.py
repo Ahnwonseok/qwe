@@ -1,5 +1,3 @@
-from PIL import Image
-import math
 import matplotlib.pyplot as plt
 import cv2
 import tensorflow as tf
@@ -13,8 +11,6 @@ tf.compat.v1.disable_eager_execution()
 from model.facenet import Facenet
 from function.crop import crop
 from function.load_imgs import load_imgs
-from function.shape_to_np import shape_to_np
-from function.trig import trig
 from function.shape import shape
 from function.rotate import rotate
 
