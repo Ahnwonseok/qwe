@@ -5,8 +5,9 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 import numpy as np
 import glob
 import dlib
-import tensorflow.compat.v1 as tf
 tf.compat.v1.disable_eager_execution()
+
+import os
 
 from model.facenet import Facenet
 from function.crop import crop
@@ -14,13 +15,17 @@ from function.load_imgs import load_imgs
 from function.shape import shape
 from function.rotate import rotate
 
-profile_images_path='./images/profile'
-selfie_image_path= './images/selfie'
-model_path= './model/20180402-114759.pb'
-predictor_path ='./model/shape_predictor_68_face_landmarks.dat'
+print('AI Calculate is on')
+
+file_path = os.getcwd()
+
+profile_images_path = os.path.join(file_path, 'face_rec/images/profile')
+selfie_image_path = os.path.join(file_path, 'face_rec/images/selfie')
+model_path = os.path.join(file_path, 'face_rec/model/20180402-114759.pb')
+predictor_path = os.path.join(file_path, 'face_rec/model/shape_predictor_68_face_landmarks.dat')
 
 
-input_size= (160,160)# 모델에 삽입되는 사이즈
+input_size = (160, 160)# 모델에 삽입되는 사이즈
 
 
 ##-------------------------------------------------Load and crop images --------------------------------------------------------------------##
@@ -35,7 +40,7 @@ profile_faces=[]
 for img in profile_imgs:
     detected_faces=crop(img,input_size)
     for detected_face in detected_faces:
-        profile_faces.append(detected_face)# 얼굴 하나씩 들어있다.
+        profile_faces.append(detected_face) # 얼굴 하나씩 들어 있다.
 
 selfie_faces=crop(selfie_img[0],input_size) # 한장만
 
@@ -43,9 +48,8 @@ selfie_faces=crop(selfie_img[0],input_size) # 한장만
 # shape 리스트 생성
 
 
-profile_shapes= shape(profile_imgs,predictor_path) 
-
-selfie_shapes = shape(selfie_img,predictor_path)
+profile_shapes= shape(profile_imgs, predictor_path)
+selfie_shapes = shape(selfie_img, predictor_path)
 
 
 # shape 정보를 바탕으로 회전
@@ -59,8 +63,8 @@ selfie_rotated_imgs=rotate(selfie_faces,selfie_shapes)
 # ##--------------------------------------------------------prediction--------------------------------------------------------------##
 facenet= Facenet(model_path)
 
-print("profile에서 탐지된 얼굴 수 :",len(profile_faces))
-print("selfie에서 탐지된 얼굴 수 :",len(selfie_faces))
+print("profile에서 탐지된 얼굴 수 :", len(profile_faces))
+print("selfie에서 탐지된 얼굴 수 :", len(selfie_faces))
 
 profile_predictions= facenet.get_embeddings(profile_rotated_imgs)
 selfie_predictions = facenet.get_embeddings(selfie_rotated_imgs) 

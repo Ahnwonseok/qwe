@@ -5,6 +5,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.metrics.pairwise import cosine_similarity
 import random
 
+
 class recommendation():
     def __init__(self, embedding_matrix=None ,id=None):
         """
