@@ -1,8 +1,6 @@
 import unittest
 import inspect
 
-from voice.main import main
-
 
 # 사용법: python -m unittest test.TestCase101 또는 초록색 화살표 누르기 ( 개별 )
 # unittest.TestCase를 상속받은 클래스를 만든다

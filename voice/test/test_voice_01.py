@@ -29,7 +29,10 @@ class TestCase01(unittest.TestCase):
         # Given - 테스트 준비
         # When - 실행
         # Then - 결과
-        pass
+        self.assertEqual(0, 0)
+
+    def test_fail_case(self):
+        self.assertEqual(1, 0)
 
 
 # unittest를 실행
