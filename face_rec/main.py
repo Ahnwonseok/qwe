@@ -1,3 +1,6 @@
+"""
+ 얼굴 인증 메인 함수
+"""
 import matplotlib.pyplot as plt
 import cv2
 import tensorflow as tf
