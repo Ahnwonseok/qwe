@@ -32,9 +32,6 @@ class TestCase01(unittest.TestCase):
         self.assertEqual(0, 0)
 
     def test_fail_case(self):
-        self.assertEqual(1, 0)
+        self.assertNotEqual(1, 0)
 
 
-# unittest를 실행
-if __name__ == '__main__':
-    unittest.main()

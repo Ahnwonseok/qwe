@@ -30,8 +30,3 @@ class TestCase01(unittest.TestCase):
         # When - 실행
         # Then - 결과
         pass
-
-
-# unittest를 실행
-if __name__ == '__main__':
-    unittest.main()

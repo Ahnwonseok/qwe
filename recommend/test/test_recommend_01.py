@@ -25,11 +25,5 @@ class TestCase01(unittest.TestCase):
         # Given - 테스트 준비
 
         # When - 실행
-        a = main()
         # Then - 결과
-        self.assertEqual(a, 10)
 
-
-# unittest를 실행
-if __name__ == '__main__':
-    unittest.main()
