@@ -4,11 +4,14 @@
 
 
 ***
+## Structure
+
+![img_1.png](img_1.png)
 
 
 <br> 
 
-## Function
+## Functions
 ### `Recommend Interest` `Face recognize` `ChatBot` `Voice recognition`
 
 <br>

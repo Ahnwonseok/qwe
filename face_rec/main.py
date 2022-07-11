@@ -16,7 +16,6 @@ from face_rec.function.rotate import rotate
 from pathlib import Path
 
 
-
 def main():
 
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
