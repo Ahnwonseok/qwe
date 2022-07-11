@@ -1,5 +1,5 @@
 import unittest
-
+from face_rec.main import main
 
 # 사용법: python -m unittest test.TestCase101 또는 초록색 화살표 누르기 ( 개별 )
 # unittest.TestCase를 상속받은 클래스를 만든다
@@ -28,5 +28,6 @@ class TestCase01(unittest.TestCase):
         # 함수 명은 test_로 시작 해야 한다
         # Given - 테스트 준비
         # When - 실행
+        d = main()
         # Then - 결과
-        pass
+        self.assertEqual(d, 'done')

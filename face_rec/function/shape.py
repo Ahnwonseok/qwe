@@ -1,5 +1,5 @@
 import dlib
-from function.shape_to_np import shape_to_np
+from face_rec.function.shape_to_np import shape_to_np
 
 
 def shape(imgs,predictor_path):

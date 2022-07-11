@@ -1,5 +1,5 @@
 import cv2
-from function.trig  import trig
+from face_rec.function.trig  import trig
 import math
 import numpy as np
 
