@@ -2,9 +2,9 @@ name: Python Package using Conda
 
 on:
   push:
-    branches: [main]
+    branches: ['main']
   pull-request:
-    branches: [main]
+    branches: ['main']
 
 jobs:
   ci:
