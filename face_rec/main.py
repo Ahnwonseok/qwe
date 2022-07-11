@@ -1,23 +1,28 @@
 """
  얼굴 인증 메인 함수
 """
+import os
+import sys
+from pathlib import Path
+# # 경로 참조 추가
+# ROOT_DIR = str(Path(__file__).parent.parent)
+# sys.path.append(ROOT_DIR)
+
 import matplotlib.pyplot as plt
 import cv2
 import tensorflow as tf
 import numpy as np
 import glob
 import dlib
-import os
 from face_rec.model.facenet import Facenet
 from face_rec.function.crop import crop
 from face_rec.function.load_imgs import load_imgs
 from face_rec.function.shape import shape
 from face_rec.function.rotate import rotate
-from pathlib import Path
 
 
-def main():
-
+def face_main():
+    sys.path.append('/Sinor_AI')
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
     tf.compat.v1.disable_eager_execution()
     print('AI Calculate is on')
@@ -99,7 +104,3 @@ def main():
     #     plt.imshow(a)
     #     plt.show()
     return 'done'
-
-
-if __name__ == '__main__':
-    main()
