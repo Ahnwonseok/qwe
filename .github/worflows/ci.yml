@@ -1,0 +1,22 @@
+name : TEST for CI
+on :
+  push:
+    branches: ['main']
+  pull_request:
+    branches : ['main']
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Anaconda-Action
+      - uses: fdiblen/anaconda-action@0.1.20
+        with :
+          pythonVersion: 3.10
+          activateEnv: true
+
+      - run : python -V
+
+
+
+
+
