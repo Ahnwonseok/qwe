@@ -1,99 +1,86 @@
 """
  얼굴 인증 메인 함수
+ 실행 시간 : 2.137037992477417
 """
 import os
-import sys
-from pathlib import Path
-# # 경로 참조 추가
-# ROOT_DIR = str(Path(__file__).parent.parent)
-# sys.path.append(ROOT_DIR)
-
-import matplotlib.pyplot as plt
 import cv2
-import tensorflow as tf
 import numpy as np
-import glob
-import dlib
-from face_rec.model.facenet import Facenet
-from face_rec.function.crop import crop
-from face_rec.function.load_imgs import load_imgs
-from face_rec.function.shape import shape
-from face_rec.function.rotate import rotate
+import face_recognition
+import shutil
+import time
+# start = time.time()
+# print("time :", time.time() - start)
+
+def get_face_embedding(face):
+    return face_recognition.face_encodings(face)
+
+def get_face_embedding_dict(dir_path):
+    
+    file_list = os.listdir(dir_path)
+    embedding_dict = {}
+    
+    for file in file_list:
+        try:
+            img_path = os.path.join(dir_path, file) # 경로를 병합하여 새 경로 생성
+            face = cv2.imread(img_path)    # 얼굴 영역만 자른 이미지 불러오기
+        except:
+            print('FileNotFoundError')
+            raise FileNotFoundError
+        
+        embedding = get_face_embedding(face)   # 얼굴 영역에서 얼굴 임베딩 벡터를 추출
+        if len(embedding) > 0:   # 얼굴 영역이 제대로 detect되지 않았을 경우를 대비
+            # os.path.splitext(file)[0]에는 이미지파일명에서 확장자를 제거한 이름이 담긴다. 
+            embedding_dict[os.path.splitext(file)[0]] = embedding[0]
+        else:
+            print(f"({file})사진을 등록할 수 없습니다.\n 다시 등록하세요") # 사진으로 인식하지 못하여 embedding이 0인 경우 사용할 수 없음
+            # 임베딩 값을 얻을 수 없는 사진은  unrecognized 폴더로 이동
+            shutil.move(img_path, 'images/unrecognized/' + file)
+            return
+            
+    return embedding_dict
+
+def main():
+    start = time.time()
+    profile_path = 'images/crop_gray_faces/'
+    now_face_path = 'images/crop_gray_now_face/'
+
+    profile_photo_embedding_dict = get_face_embedding_dict(profile_path) # 파일 이름과 변환된 백터 딕셔너리
+    now_photo_embedding_dict = get_face_embedding_dict(now_face_path)
 
 
-def face_main():
-    sys.path.append('/Sinor_AI')
-    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-    tf.compat.v1.disable_eager_execution()
-    print('AI Calculate is on')
+    profile_photo__name = [i for i in profile_photo_embedding_dict.keys()] # 프로필 사진의 이름만 담기
 
-    ROOT_DIR = Path(__file__).parent.parent
-    print(f'root_path is  {ROOT_DIR}')
+    now_photo_name = next(iter(now_photo_embedding_dict)) # 현재 사진
+    
+    all_img = {} # 전체 프로필 사진
 
-    profile_images_path = os.path.join(ROOT_DIR, 'face_rec/images/profile/asd')
-    selfie_image_path = os.path.join(ROOT_DIR, 'face_rec/images/selfie')
-    model_path = os.path.join(ROOT_DIR, 'face_rec/model/20180402-114759.pb')
-    predictor_path = os.path.join(ROOT_DIR, 'face_rec/model/shape_predictor_68_face_landmarks.dat')
+    for i in profile_photo__name:
+        embedding = np.linalg.norm(profile_photo_embedding_dict[i]-now_photo_embedding_dict[now_photo_name], ord=2)
+        all_img[i] = embedding
+            
+    allowed_photo = {}
+    disallowed_photo = {}
+    for tup in all_img.items():
+        if tup[1] < 0.5: # 임베딩 차 0.5 이하는 동일인 이상은 비동일인
+            allowed_photo[tup[0]] = tup[1] # 동일인에 저장
+        else:
+            disallowed_photo[tup[0]] = tup[1] # 비동일인에 저장
+    
+    print('프로필 사진 :\n', all_img)
+    print('-------------------')
+    print('비동일인 :\n', disallowed_photo)
+    print('동일인 :\n', allowed_photo)
+    print('-------------------')
+    
+    if len(all_img) > 0: # 찍은 사진이 1개 이상 있어야한다.
+        if len(allowed_photo) > 3: # 동일인으로 인식한 3개의 사진 이상이 있어야 로그인
+            print('로그인 되었습니다.')
+        else:
+            print(f"정면 사진 {3 - len(allowed_photo)}개가 부족합니다. 다시 시도하세요")
+    else:
+        print('사진을 넣어주세요')
+    print("time :", time.time() - start)
+    return
 
-    input_size = (160, 160)  # 모델에 삽입되는 사이즈
-
-    ##-------------------------------------------------Load and crop images --------------------------------------------------------------------##
-
-    profile_imgs = load_imgs(profile_images_path)  # 리스트 반환 / 원본 로드
-    selfie_img = load_imgs(selfie_image_path)
-
-    predictor = dlib.shape_predictor(predictor_path)
-    detector = dlib.get_frontal_face_detector()
-
-    profile_faces = []
-    for img in profile_imgs:
-        detected_faces = crop(img, input_size)
-        for detected_face in detected_faces:
-            profile_faces.append(detected_face)  # 얼굴 하나씩 들어 있다.
-
-    selfie_faces = crop(selfie_img[0], input_size)  # 한장만
-
-    # shape 리스트 생성
-
-    profile_shapes = shape(profile_imgs, predictor_path)
-    selfie_shapes = shape(selfie_img, predictor_path)
-
-    # shape 정보를 바탕으로 회전
-
-    profile_rotated_imgs = rotate(profile_faces, profile_shapes)
-    selfie_rotated_imgs = rotate(selfie_faces, selfie_shapes)
-
-    # ##--------------------------------------------------------prediction--------------------------------------------------------------##
-    facenet = Facenet(model_path)
-
-    print("profile에서 탐지된 얼굴 수 :", len(profile_faces))
-    print("selfie에서 탐지된 얼굴 수 :", len(selfie_faces))
-
-    profile_predictions = facenet.get_embeddings(profile_rotated_imgs)
-    selfie_predictions = facenet.get_embeddings(selfie_rotated_imgs)
-
-    profile_predictions = np.reshape(profile_predictions, [-1, 1, 512])
-    selfie_predictions = np.reshape(selfie_predictions, [-1, 1, 512])
-
-    eucledian_dist = []
-    same_lsit = []
-
-    print("벡터 거리 정보/ 0.9 이하는 동일인")
-    for i in range(len(profile_predictions)):
-        for j in range(len(selfie_predictions)):
-            dist = np.linalg.norm(profile_predictions[i] - selfie_predictions[j])
-            eucledian_dist.append(dist)
-            if dist >= 0.9:
-                same_lsit.append([i, dist])
-    print(eucledian_dist)
-    print(f'동일인 리스트 : {same_lsit}')
-
-    ## ----------------------------------- 이미지 체크할 때/ loded_imgs에 profile_imgs 나 selfie_imgs 를 써서 크로핑 된 이미지를 확인 가능하다 -------------------------------##
-    loaded_imgs = profile_rotated_imgs  # select profile_imgs or selfie_imgs
-
-    # for i in loaded_imgs:
-    #     a= cv2.cvtColor(i, cv2.COLOR_BGR2RGB)
-    #     a=np.array(a)
-    #     plt.imshow(a)
-    #     plt.show()
-    return 'done'
+if __name__ == '__main__':
+    main()
