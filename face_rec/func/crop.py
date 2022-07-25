@@ -40,19 +40,18 @@ def detectAndDisplay(c,save):
     
     detections=model.forward()
     for i in range(0, detections.shape[2]):
+    
+        confidence = detections[0, 0, i, 2]
+        min_confidence=0.9
+        img_name = c.split('/')[-1]
             
-            confidence = detections[0, 0, i, 2]
-            min_confidence=0.9
-            img_name = c.split('/')[-1]
+        if confidence > min_confidence:
+              
+            box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
+            (startX, startY, endX, endY) = box.astype("int")
             
-            if confidence > min_confidence:
-                    
-                    box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
-                    (startX, startY, endX, endY) = box.astype("int")
-                    
-                    if height > endY and width > endX : #예외처리   
-                            # print(save + img_name)                                        
-                            cv2.imwrite(save + img_name, img[startY:endY,startX:endX])
+            if height > endY and width > endX : #예외처리   
+                cv2.imwrite(save + img_name, img[startY:endY,startX:endX])
                             
     unrecog = 'images/unrecognized/'
     if img_name not in os.listdir(save):
@@ -62,58 +61,72 @@ def detectAndDisplay(c,save):
 
 
 def crop_run():
-    try:
-        color_img_path = 'images/color_faces/'
-        crop_save_path = 'images/crop_faces/'
-        color_now_img_path = 'images/color_now_face/'
-        crop_now_save_path = 'images/crop_now_face/'
-        # 한글 파일은 cv2 오류가 생기기 때문에 랜덤 영문으로 바꿔준다.
-        # 나머지 특수문자 숫자는 이상없음
-        for c in make_path_list(color_img_path):
-            name = Path(c).stem
-            extension = os.path.splitext(c)
-            
-            Korean = re.findall('[가-힣]', name) # 한글 찾기
-            # 한글 찾아서 랜덤 영문자로 파일 이름 바꾸기 
-            if Korean:
-                for i in Korean:
-                    name = name.replace(i, f'{random.choice(string.ascii_letters)}')
-                file_oldname = c
-                file_newname_newfile = color_img_path + name + '.' + extension
-                
-                os.rename(file_oldname, file_newname_newfile)
-            else:
-                pass
-            if extension == 'png' or 'jpg': # 확장자 확인
-                detectAndDisplay(c, crop_save_path)
-            else:
-                print('Allow png, jpg extensions only')
-            
-            
-        for c in make_path_list(color_now_img_path):
-            name = Path(c).stem
-            extension = os.path.splitext(c)
-            
-            Korean = re.findall('[가-힣]', name) # 한글 찾기
-            # 한글 찾아서 랜덤 영문자로 파일 이름 바꾸기 
-            if Korean:
-                for i in Korean:
-                    name = name.replace(i, f'{random.choice(string.ascii_letters)}')
-                file_oldname = c
-                file_newname_newfile = color_img_path + name + '.' + extension
-                
-                os.rename(file_oldname, file_newname_newfile)
-            else:
-                pass
-            if extension == 'png' or 'jpg': # 확장자 확인
-                detectAndDisplay(c, crop_now_save_path)
-            else:
-                print('Allow png, jpg extensions only')
+    color_img_path = 'images/color_faces/'
+    color_now_img_path = 'images/color_now_face/'
+    crop_save_path = 'images/crop_faces/'
+    crop_now_save_path = 'images/crop_now_face/'
+    
+    for e in os.listdir(color_img_path) + os.listdir(color_now_img_path):
+        extension = e.split('.')[-1]
+        if extension == 'png' or 'jpg': # 확장자 확인
+            pass
+        else:
+            print('Allow png, jpg extensions only')
+    
+    
+    # 한글 파일은 cv2 오류가 생기기 때문에 랜덤 영문으로 바꿔준다.
+    # 나머지 특수문자 숫자는 이상없음
+    for c in make_path_list(color_img_path):
+        name = Path(c).stem
+        extension = c.split('.')[-1]
         
-    except:
-        print('FileNotFoundError : img')
-        return
+        # 영어, 숫자, 특수문자 외에 문자 변경
+        Unacceptable_characters = re.findall('[^A-Za-z0-9]', name)
+        for i in re.findall('^[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]', name):
+            Unacceptable_characters.append(i)
+        
+        # 한글 찾아서 랜덤 영문자로 파일 이름 바꾸기 
+        if Unacceptable_characters:
+            for i in Unacceptable_characters:
+                name = name.replace(i, f'{random.choice(string.ascii_letters)}')
+                
+            oldfile_path = c
+            newfile_path = color_img_path + name + '.' + extension
+            os.rename(oldfile_path, newfile_path)
 
+    
+            
+            
+    for c in make_path_list(color_now_img_path):
+        name = Path(c).stem
+        extension = c.split('.')[-1]
+        
+        # 영어, 숫자, 특수문자 외에 문자 변경
+        Unacceptable_characters = re.findall('[^A-Za-z0-9]', name)
+        for i in re.findall('^[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]', name):
+            Unacceptable_characters.append(i)
+        
+        # 한글 찾아서 랜덤 영문자로 파일 이름 바꾸기 
+        if Unacceptable_characters:
+            for i in Unacceptable_characters:
+                name = name.replace(i, f'{random.choice(string.ascii_letters)}')
+                
+            oldfile_path = c
+            newfile_path = color_img_path + name + '.' + extension
+            os.rename(oldfile_path, newfile_path)
+
+    
+    color_path_list = make_path_list(color_img_path)         
+    color_now_path_list = make_path_list(color_now_img_path)
+
+    # 위 반복문이 끝나고 바뀐 path를 가지고 detectAndDisplay
+    for p in color_path_list:
+        detectAndDisplay(p, crop_save_path)
+        
+    for p in color_now_path_list:
+        detectAndDisplay(p, crop_now_save_path)
+    
+            
 '''각자 실행할 때'''  
 if __name__ == '__main__':
     crop_run()
