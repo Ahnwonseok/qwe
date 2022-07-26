@@ -27,7 +27,7 @@ def new_comparison():
     for img in img_list:  
         img_name = img.split("\\")[-1]
         try:                            #img_path : profile 사진   /  img2_path = 비교하는 사진
-            resp.append(DeepFace.verify(img1_path=profile_dir+profile_name[0], img2_path=img, model_name=models[-2]))
+            resp.append(DeepFace.verify(img1_path=profile_dir+profile_name[0], img2_path=img, model_name=models[2]))
             #인식을 잘하면 crop_faces로 보냄
             shutil.copy(img, save+img_name) 
 

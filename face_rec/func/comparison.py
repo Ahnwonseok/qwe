@@ -29,17 +29,24 @@ def get_face_embedding_dict(dir_path):
         
         if len(embedding) > 0:   # crop한 이미지에서 얼굴 영역이 제대로 detect되지 않았을 경우를 대비
             # os.path.splitext(file)[0]에는 이미지파일명에서 확장자를 제거한 이름이 담긴다.
-            embedding_dict[os.path.splitext(file)[0]] = embedding[0]
+            embedding_dict[file.split('.')[-2]] = embedding[0]
         else:
             # crop한 이미지가 임베딩 값을 구하지 못할 때 원본 사진을 face_recognition.face_encodings한다.
             crop_name = dir_path.split('/')[-2]
             # crop_faces --> faces
             # crop_now_faces --> now_faces
             Original_name = crop_name.replace('crop_', '')
-            face = cv2.imread(f'face_rec/images/{Original_name}/' + file) # face_rec/images/faces/'IU12.jpg
+
+            face = cv2.imread(f'face_rec/images/{Original_name}/' + file) # face_rec/images/faces/IU12.jpg
             embedding = get_face_embedding(face)
             
-            embedding_dict[os.path.splitext(file)[0]] = embedding[0]
+            # 원본 사진마저 인식을 못하는 경우
+            unrecog_path = 'face_rec/images/unrecognized/'
+            if len(embedding) == 0:
+                print(file.split('.')[-2], '가 아닌 다른 사진을 넣어주세요. --> 얼굴 인식 안됌')
+                shutil.copy(img_path, unrecog_path + file) # 파일 이동
+                continue
+            embedding_dict[file.split('.')[-2]] = embedding[0]
     return embedding_dict
 
 def comparison():
@@ -49,15 +56,16 @@ def comparison():
     profile_photo_embedding_dict = get_face_embedding_dict(profile_path) # 파일 이름과 변환된 임베딩 벡터 딕셔너리
     now_photo_embedding_dict = get_face_embedding_dict(now_face_path)
     
-    profile_photo__name = [i for i in profile_photo_embedding_dict.keys()] # 프로필 사진의 이름만 담기
+    profile_photo_name = [i for i in profile_photo_embedding_dict.keys()] # 프로필 사진의 이름만 담기
     try:
         now_photo_name = next(iter(now_photo_embedding_dict)) # 현재 사진
+        print(now_face_path)
     except:
         print('FileNotFoundError : 현재 사진을 넣어주세요')
         pass
     all_img = {} # 전체 프로필 사진
 
-    for i in profile_photo__name:
+    for i in profile_photo_name:
         embedding = np.linalg.norm(profile_photo_embedding_dict[i]-now_photo_embedding_dict[now_photo_name], ord=2)
         all_img[i] = round(embedding, 3)
     

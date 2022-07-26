@@ -56,7 +56,7 @@ def detectAndDisplay(c,save):
     unrecog = 'face_rec/images/unrecognized/'
     if img_name not in os.listdir(save):
             print(img_name.split('.')[-2], '가 아닌 다른 사진을 넣어주세요. --> 얼굴 인식 안됌')
-            shutil.copy(c, unrecog+img_name) # 파일 이동
+            shutil.copy(c, unrecog+img_name) # 파일 복사
                         
 
 
