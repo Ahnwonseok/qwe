@@ -5,8 +5,8 @@ import time
 
 
 if __name__ == '__main__':
-    crop_run()
     start = time.time()
-    comparison()
+    crop_run() # 사진 crop
+    comparison() # 임베딩 값으로 사진 비교
+    DeleteAllFiles() # 사용 가능,불가능한 사진 저장하고 초기화
     print("time :", time.time() - start)
-    DeleteAllFiles()
