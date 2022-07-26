@@ -5,8 +5,8 @@ import time
 
 
 if __name__ == '__main__':
-    start = time.time()
     crop_run()
+    start = time.time()
     comparison()
-    DeleteAllFiles()
     print("time :", time.time() - start)
+    DeleteAllFiles()

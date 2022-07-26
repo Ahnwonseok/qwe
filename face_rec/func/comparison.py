@@ -60,18 +60,18 @@ def comparison():
 
     for i in profile_photo__name:
         embedding = np.linalg.norm(profile_photo_embedding_dict[i]-now_photo_embedding_dict[now_photo_name], ord=2)
-        all_img[i] = embedding
+        all_img[i] = round(embedding, 3)
     
     allowed_photo = {} # 사용 가능
     disallowed_photo = {} # 사용 불가능
     
     for tup in all_img.items():
         if tup[1] < 0.31: # 임베딩 차 0.3 이하는 동일인 이상은 비동일인
-            allowed_photo[tup[0]] = tup[1] # 동일인에 저장
+            allowed_photo[tup[0]] = round(tup[1], 3) # 동일인에 저장
         else:
-            disallowed_photo[tup[0]] = tup[1] # 비동일인에 저장
+            disallowed_photo[tup[0]] = round(tup[1], 3) # 비동일인에 저장
     
-    print('등록 하려는 프로필 사진 :\n', all_img, 'count : ', len(all_img))
+    print('등록 하려는 프로필 사진 :\n', all_img, 'count :', len(all_img))
     print('-------------------')
     print('70% > :\n', disallowed_photo)
     print('70% < :\n', allowed_photo)
