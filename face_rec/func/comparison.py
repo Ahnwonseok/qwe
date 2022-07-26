@@ -28,7 +28,7 @@ def get_face_embedding_dict(dir_path):
         embedding = get_face_embedding(face)   # 얼굴 영역에서 얼굴 임베딩 벡터를 추출
         
         if len(embedding) > 0:   # crop한 이미지에서 얼굴 영역이 제대로 detect되지 않았을 경우를 대비
-            # os.path.splitext(file)[0]에는 이미지파일명에서 확장자를 제거한 이름이 담긴다.
+            # key = 파일 이름, value = 임베딩 값 --> 저장
             embedding_dict[file.split('.')[-2]] = embedding[0]
         else:
             # crop한 이미지가 임베딩 값을 구하지 못할 때 원본 사진을 face_recognition.face_encodings한다.
@@ -40,9 +40,12 @@ def get_face_embedding_dict(dir_path):
             face = cv2.imread(f'face_rec/images/{Original_name}/' + file) # face_rec/images/faces/IU12.jpg
             embedding = get_face_embedding(face)
             
+
             # 원본 사진마저 인식을 못하는 경우
             unrecog_path = 'face_rec/images/unrecognized/'
-            if len(embedding) == 0:
+            if len(embedding) > 0:
+                pass
+            else:
                 print(file.split('.')[-2], '가 아닌 다른 사진을 넣어주세요. --> 얼굴 인식 안됌')
                 shutil.copy(img_path, unrecog_path + file) # 파일 이동
                 continue
@@ -59,7 +62,6 @@ def comparison():
     profile_photo_name = [i for i in profile_photo_embedding_dict.keys()] # 프로필 사진의 이름만 담기
     try:
         now_photo_name = next(iter(now_photo_embedding_dict)) # 현재 사진
-        print(now_face_path)
     except:
         print('FileNotFoundError : 현재 사진을 넣어주세요')
         pass
