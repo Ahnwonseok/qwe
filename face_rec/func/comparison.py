@@ -43,7 +43,6 @@ def get_face_embedding_dict(dir_path):
     return embedding_dict
 
 def comparison():
-    # start = time.time()
     profile_path = 'face_rec/images/crop_faces/'
     now_face_path = 'face_rec/images/crop_now_face/'
 
@@ -66,15 +65,15 @@ def comparison():
     disallowed_photo = {} # 사용 불가능
     
     for tup in all_img.items():
-        if tup[1] < 0.31: # 임베딩 차 0.3 이하는 동일인 이상은 비동일인
+        if tup[1] <= 0.4: # 임베딩 차 0.4 이하는 동일인 이상은 비동일인
             allowed_photo[tup[0]] = round(tup[1], 3) # 동일인에 저장
         else:
             disallowed_photo[tup[0]] = round(tup[1], 3) # 비동일인에 저장
     
     print('등록 하려는 프로필 사진 :\n', all_img, 'count :', len(all_img))
     print('-------------------')
-    print('70% > :\n', disallowed_photo)
-    print('70% < :\n', allowed_photo)
+    print('60% > :\n', disallowed_photo)
+    print('60% < :\n', allowed_photo)
     print('-------------------')
     
     if len(all_img) > 0: # 찍은 사진이 1개 이상 있어야한다.
