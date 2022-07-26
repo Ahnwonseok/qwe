@@ -12,9 +12,9 @@ def make_path_list(path): # 경로 만들기
 
 def DeleteAllFiles():
     try:
-        crop_path = make_path_list('images/crop_faces/')
-        crop_now_path = make_path_list('images/crop_now_face/')
-        unrecognized_path = make_path_list('images/unrecognized/')
+        crop_path = make_path_list('face_rec/images/crop_faces/')
+        crop_now_path = make_path_list('face_rec/images/crop_now_face/')
+        unrecognized_path = make_path_list('face_rec/images/unrecognized/')
         try:
             for path in crop_path:
                 os.remove(path)
@@ -24,7 +24,7 @@ def DeleteAllFiles():
                 os.remove(path)
         except:
             print('PermissionError [WinError 5] 액세스가 거부되었습니다')
-            return
+            pass
     except:
         pass
     

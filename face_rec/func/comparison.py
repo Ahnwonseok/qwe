@@ -33,19 +33,19 @@ def get_face_embedding_dict(dir_path):
         else:
             # crop한 이미지가 임베딩 값을 구하지 못할 때 원본 사진을 face_recognition.face_encodings한다.
             crop_name = dir_path.split('/')[-2]
-            Original_name = crop_name.replace('crop', 'color') # 파일 이름이 바뀌면 이부분도 수정 해야함
-            # crop_faces --> color_faces
-            # crop_now_faces --> color_now_faces
-            face = cv2.imread(f'images/{Original_name}/' + file) # images/color_faces/'IU12.jpg
+            # crop_faces --> faces
+            # crop_now_faces --> now_faces
+            Original_name = crop_name.replace('crop_', '')
+            face = cv2.imread(f'face_rec/images/{Original_name}/' + file) # face_rec/images/faces/'IU12.jpg
             embedding = get_face_embedding(face)
             
             embedding_dict[os.path.splitext(file)[0]] = embedding[0]
     return embedding_dict
 
-def comparaion():
+def comparison():
     # start = time.time()
-    profile_path = 'images/crop_faces/'
-    now_face_path = 'images/crop_now_face/'
+    profile_path = 'face_rec/images/crop_faces/'
+    now_face_path = 'face_rec/images/crop_now_face/'
 
     profile_photo_embedding_dict = get_face_embedding_dict(profile_path) # 파일 이름과 변환된 임베딩 벡터 딕셔너리
     now_photo_embedding_dict = get_face_embedding_dict(now_face_path)
@@ -73,8 +73,8 @@ def comparaion():
     
     print('등록 하려는 프로필 사진 :\n', all_img, 'count : ', len(all_img))
     print('-------------------')
-    print('비동일인 :\n', disallowed_photo)
-    print('동일인 :\n', allowed_photo)
+    print('70% > :\n', disallowed_photo)
+    print('70% < :\n', allowed_photo)
     print('-------------------')
     
     if len(all_img) > 0: # 찍은 사진이 1개 이상 있어야한다.
@@ -82,15 +82,15 @@ def comparaion():
             print('프로필 등록이 완료되었습니다.')
             try:
                 # 승인된 프로필 등록 Acceptable_Profiles copy
-                color_img_path = 'images/color_faces/'
-                accept_path_list = [color_img_path +i[0]+'.jpg' for i in allowed_photo.items()]
+                img_path = 'face_rec/images/faces/'
+                accept_path_list = [img_path +i[0]+'.jpg' for i in allowed_photo.items()]
                 for path in accept_path_list:
-                    shutil.copy(path, 'images/Allowed_or_NonAllowed/Acceptable_Profiles/' + path.split('/')[-1])
+                    shutil.copy(path, 'face_rec/images/Allowed_or_NonAllowed/Acceptable_Profiles/' + path.split('/')[-1])
 
                 # 추가로 승인되지 않은 프로필 등록 Unacceptable_Profiles copy
-                path_list = ['images/unrecognized/'+i for i in os.listdir('images/unrecognized/')]
+                path_list = ['face_rec/images/unrecognized/'+i for i in os.listdir('face_rec/images/unrecognized/')]
                 for path in path_list:
-                    shutil.copy(path, 'images/Allowed_or_NonAllowed/Unacceptable_Profiles/' + path.split('/')[-1])
+                    shutil.copy(path, 'face_rec/images/Allowed_or_NonAllowed/Unacceptable_Profiles/' + path.split('/')[-1])
             except:
                 pass
         else:
@@ -102,4 +102,4 @@ def comparaion():
 
 '''각자 실행할 때'''  
 if __name__ == '__main__':
-    comparaion()
+    comparison()

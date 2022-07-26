@@ -24,8 +24,8 @@ def make_path_list(path): # 경로 만들기
     path_list = [base_path + file for file in path_file]
     return path_list
 
-model_name='res10_300x300_ssd_iter_140000.caffemodel'
-prototxt_name='deploy.prototxt.txt'
+model_name='face_rec/res10_300x300_ssd_iter_140000.caffemodel'
+prototxt_name='face_rec/deploy.prototxt.txt'
 
 def detectAndDisplay(c,save):
     # 원본 사진을 face_recognition.face_encodings 를 활용해
@@ -53,7 +53,7 @@ def detectAndDisplay(c,save):
             if height > endY and width > endX : #예외처리   
                 cv2.imwrite(save + img_name, img[startY:endY,startX:endX])
                             
-    unrecog = 'images/unrecognized/'
+    unrecog = 'face_rec/images/unrecognized/'
     if img_name not in os.listdir(save):
             print(img_name.split('.')[-2], '가 아닌 다른 사진을 넣어주세요. --> 얼굴 인식 안됌')
             shutil.copy(c, unrecog+img_name) # 파일 이동
@@ -61,12 +61,12 @@ def detectAndDisplay(c,save):
 
 
 def crop_run():
-    color_img_path = 'images/color_faces/'
-    color_now_img_path = 'images/color_now_face/'
-    crop_save_path = 'images/crop_faces/'
-    crop_now_save_path = 'images/crop_now_face/'
+    img_path = 'face_rec/images/faces/'
+    now_img_path = 'face_rec/images/now_face/'
+    crop_save_path = 'face_rec/images/crop_faces/'
+    crop_now_save_path = 'face_rec/images/crop_now_face/'
     
-    for e in os.listdir(color_img_path) + os.listdir(color_now_img_path):
+    for e in os.listdir(img_path) + os.listdir(now_img_path):
         extension = e.split('.')[-1]
         if extension == 'png' or 'jpg': # 확장자 확인
             pass
@@ -76,7 +76,7 @@ def crop_run():
     
     # 한글 파일은 cv2 오류가 생기기 때문에 랜덤 영문으로 바꿔준다.
     # 나머지 특수문자 숫자는 이상없음
-    for c in make_path_list(color_img_path):
+    for c in make_path_list(img_path):
         name = Path(c).stem
         extension = c.split('.')[-1]
         
@@ -91,13 +91,13 @@ def crop_run():
                 name = name.replace(i, f'{random.choice(string.ascii_letters)}')
                 
             oldfile_path = c
-            newfile_path = color_img_path + name + '.' + extension
+            newfile_path = img_path + name + '.' + extension
             os.rename(oldfile_path, newfile_path)
 
     
             
             
-    for c in make_path_list(color_now_img_path):
+    for c in make_path_list(now_img_path):
         name = Path(c).stem
         extension = c.split('.')[-1]
         
@@ -112,18 +112,18 @@ def crop_run():
                 name = name.replace(i, f'{random.choice(string.ascii_letters)}')
                 
             oldfile_path = c
-            newfile_path = color_img_path + name + '.' + extension
+            newfile_path = img_path + name + '.' + extension
             os.rename(oldfile_path, newfile_path)
 
     
-    color_path_list = make_path_list(color_img_path)         
-    color_now_path_list = make_path_list(color_now_img_path)
+    path_list = make_path_list(img_path)         
+    now_path_list = make_path_list(now_img_path)
 
     # 위 반복문이 끝나고 바뀐 path를 가지고 detectAndDisplay
-    for p in color_path_list:
+    for p in path_list:
         detectAndDisplay(p, crop_save_path)
         
-    for p in color_now_path_list:
+    for p in now_path_list:
         detectAndDisplay(p, crop_now_save_path)
     
             
